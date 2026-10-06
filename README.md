@@ -36,23 +36,33 @@ Son propuestas: los datos no miden la conectividad ni la capacidad de cada agent
 
 **Datos abiertos → Power Query → SQL Server → Power BI**
 
-- **Power Query:** uní los archivos bimestrales de Juntos y los anuales de agencias, y conservé el ubigeo como texto de 6 dígitos.
-- **SQL Server:** crucé las fuentes por ubigeo, validé la carga con controles de calidad y calculé la distancia a la agencia más cercana con el tipo `geography`.
-- **Power BI:** modelo, medidas DAX y un dashboard de 4 páginas.
-- **Validación manual:** revisé los agentes de los 10 distritos prioritarios en el buscador del Banco de la Nación.
+| Paso | Herramienta | Qué resolví |
+|---|---|---|
+| Preparar | Power Query | Uní 3 años de Juntos (30,143 filas, 16 bimestres) y 3 cortes de agencias. Detecté archivos acumulados y duplicados que habrían inflado los resultados. |
+| Cargar | SQL Server | Los CSV traían formato regional (coma decimal, fechas día/mes/año). Importé esas columnas como texto y las convertí en SQL, con controles de totales. |
+| Validar | SQL Server | 7 controles: conteos, duplicados, ubigeo de 6 dígitos, coordenadas dentro del Perú y cruces sin pareja. Detectaron errores reales, como montos multiplicados por 100. |
+| Medir distancias | SQL Server | Para cada uno de los 1,402 distritos sin agencia, busqué la agencia más cercana con `geography::Point`, `STDistance` y `OUTER APPLY`. |
+| Priorizar | SQL Server | Calculé la carga de viaje, el ranking con `ROW_NUMBER()` y la curva de Pareto con `SUM() OVER()`. |
+| Evaluar | SQL Server | Recalculé el ranking con la red de agencias de 2024 para juzgar las aperturas con la información de ese momento. |
+| Visualizar | Power BI | Modelo con relaciones por ubigeo, medidas DAX (porcentajes, Pareto acumulado, colores condicionales) y mapa con Azure Maps. |
+| Verificar | Manual | Revisé los agentes de los 10 distritos prioritarios en el buscador del Banco de la Nación. |
+
+**¿Por qué carga de viaje y no un índice con pesos?** Porque no necesita pesos arbitrarios: mide directamente cuántas familias viajan y qué tan lejos, igual que en logística se mide el transporte (carga × distancia).
 
 Los scripts están en [`sql/`](sql/), en orden de ejecución (00 a 05). Archivo de Power BI: [descargar](https://github.com/jeanpierrecs/juntos-banco-nacion/raw/main/pbix/juntos_banco_nacion.pbix).
 
 ## Datos
 
-| Fuente | Para qué |
-|---|---|
-| [MIDIS – Programa Juntos](https://www.datosabiertos.gob.pe/group/programa-nacional-de-apoyo-directo-los-m%C3%A1s-pobres-juntos-juntos) (2024-2026) | Familias y montos por distrito |
-| [Banco de la Nación – Agencias](https://www.datosabiertos.gob.pe/dataset/relacion-de-agencias-y-oficinas-especiales-nivel-nacional-banco-de-la-naci%C3%B3n-bn) (junio de 2024, 2025 y 2026) | Agencias por distrito |
-| [Códigos equivalentes de ubigeo](https://www.datosabiertos.gob.pe/dataset/codigos-equivalentes-de-ubigeo-del-peru) | Distritos, altitud y superficie |
-| [COMPLETAR: fuente de centros poblados] | Coordenadas de las capitales de distrito |
-| Google Maps | Coordenadas de 18 distritos nuevos |
-| [Banco de la Nación – Agentes](https://www.bn.com.pe/canales-atencion/agentes-nivel-nacional.asp) | Agentes en los 10 distritos prioritarios |
+| Fuente | Para qué | Volumen |
+|---|---|---|
+| [MIDIS – Programa Juntos](https://www.datosabiertos.gob.pe/group/programa-nacional-de-apoyo-directo-los-m%C3%A1s-pobres-juntos-juntos) | Familias y montos por distrito | 30,143 filas · 2024-2026 |
+| [Banco de la Nación – Agencias](https://www.datosabiertos.gob.pe/dataset/relacion-de-agencias-y-oficinas-especiales-nivel-nacional-banco-de-la-naci%C3%B3n-bn) | Agencias por distrito | 1,660 registros · junio de 2024, 2025 y 2026 |
+| [Códigos equivalentes de ubigeo](https://www.datosabiertos.gob.pe/dataset/codigos-equivalentes-de-ubigeo-del-peru) | Distritos, altitud y superficie | 1,893 distritos |
+| [ubigeo-peru-aumentado (GitHub)](https://github.com/jmcastagnetto/ubigeo-peru-aumentado) | Coordenadas de las capitales de distrito | 94,922 centros poblados · 1,874 capitales |
+| Google Maps | Coordenadas de distritos creados recientemente | 18 distritos |
+| [Banco de la Nación – Agentes](https://www.bn.com.pe/canales-atencion/agentes-nivel-nacional.asp) | Agentes en los distritos prioritarios | 10 distritos, revisión manual |
+
+Todas las fuentes son públicas: datos abiertos del Estado peruano y un repositorio público en GitHub.
 
 ## Limitaciones
 
