@@ -36,16 +36,16 @@ Son propuestas: los datos no miden la conectividad ni la capacidad de cada agent
 
 **Datos abiertos → Power Query → SQL Server → Power BI**
 
-| Paso | Herramienta | Qué resolví |
+| Paso | Herramienta | Qué hice |
 |---|---|---|
-| Preparar | Power Query | Uní 3 años de Juntos (30,143 filas, 16 bimestres) y 3 cortes de agencias. Detecté archivos acumulados y duplicados que habrían inflado los resultados. |
-| Cargar | SQL Server | Los CSV traían formato regional (coma decimal, fechas día/mes/año). Importé esas columnas como texto y las convertí en SQL, con controles de totales. |
-| Validar | SQL Server | 7 controles: conteos, duplicados, ubigeo de 6 dígitos, coordenadas dentro del Perú y cruces sin pareja. Detectaron errores reales, como montos multiplicados por 100. |
-| Medir distancias | SQL Server | Para cada uno de los 1,402 distritos sin agencia, busqué la agencia más cercana con `geography::Point`, `STDistance` y `OUTER APPLY`. |
-| Priorizar | SQL Server | Calculé la carga de viaje, el ranking con `ROW_NUMBER()` y la curva de Pareto con `SUM() OVER()`. |
-| Evaluar | SQL Server | Recalculé el ranking con la red de agencias de 2024 para juzgar las aperturas con la información de ese momento. |
-| Visualizar | Power BI | Modelo con relaciones por ubigeo, medidas DAX (porcentajes, Pareto acumulado, colores condicionales) y mapa con Azure Maps. |
-| Verificar | Manual | Revisé los agentes de los 10 distritos prioritarios en el buscador del Banco de la Nación. |
+| Preparar | Power Query | Uní 3 años de Juntos (30,143 filas) y 3 cortes de agencias. Algunos archivos venían acumulados o repetidos, así que usé uno por año. |
+| Cargar | SQL Server | Los CSV traían coma decimal y fechas día/mes/año. Los importé como texto y los convertí en SQL. |
+| Validar | SQL Server | 7 controles: conteos, duplicados, ubigeos y coordenadas. Gracias a ellos apareció un error: montos multiplicados por 100. |
+| Medir distancias | SQL Server | Busqué la agencia más cercana a cada distrito sin agencia, con `geography` y `OUTER APPLY`. |
+| Priorizar | SQL Server | Carga de viaje, ranking con `ROW_NUMBER()` y curva de Pareto con `SUM() OVER()`. |
+| Evaluar | SQL Server | Repetí el ranking con la red de 2024, para juzgar las aperturas con lo que se sabía en ese momento. |
+| Visualizar | Power BI | Relaciones por ubigeo, medidas DAX y mapa con Azure Maps. |
+| Verificar | Manual | Revisé uno por uno los agentes de los 10 distritos prioritarios en el buscador del banco. |
 
 **¿Por qué carga de viaje y no un índice con pesos?** Porque no necesita pesos arbitrarios: mide directamente cuántas familias viajan y qué tan lejos, igual que en logística se mide el transporte (carga × distancia).
 
@@ -75,6 +75,6 @@ En el camino encontré 15 problemas de calidad en los datos, como archivos dupli
 
 ---
 
-*Si la próxima agencia se decidiera por la distancia que recorren las familias, ¿dónde estaría?*
+*Abrir una agencia cuesta; no abrirla, también. ¿Qué costo debería pesar más?*
 
 **Jean Pierre Castañeda Silva** · Analista de Datos y BI · [LinkedIn](https://www.linkedin.com/in/jeanpierrecs)
