@@ -18,7 +18,7 @@
 | **Prioridades** | **Conclusiones** |
 | ![Prioridades](img/03_prioridades.png) | ![Conclusiones](img/04_conclusiones.png) |
 
-Archivo de Power BI: [descargar `juntos_banco_nacion.pbix`](https://github.com/jeanpierrecs/juntos-banco-nacion/raw/main/pbix/juntos_banco_nacion.pbix)
+Archivo de Power BI: [descargar](https://github.com/jeanpierrecs/juntos-banco-nacion/raw/main/pbix/juntos_banco_nacion.pbix)
 
 ## Contexto
 
